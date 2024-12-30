@@ -2,6 +2,7 @@ import SwiftUI
 
 @MainActor
 protocol MainViewModel: ObservableObject {
+    var alertManager: AlertManager { get }
     var name: String { get }
     
     func logout()
@@ -26,5 +27,6 @@ struct MainView<ViewModel: MainViewModel>: View {
             }
         }
         .padding(.horizontal, 16)
+        .alertView(alertManager: vm.alertManager)
     }
 }
