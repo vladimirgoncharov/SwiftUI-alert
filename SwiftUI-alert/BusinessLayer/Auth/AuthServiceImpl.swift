@@ -5,9 +5,7 @@ import Combine
 final class AuthServiceImpl: AuthServiceProtocol {
     private let connector: (any ConnectorProtocol)
     
-#if os(watchOS)
     private var cancellables = Set<AnyCancellable>()
-#endif
     
     private let authStatePublished = CurrentValueSubject<AuthState, Never>(.unauthorized)
     var authStatePublisher: AnyPublisher<AuthState, Never> {
@@ -20,26 +18,35 @@ final class AuthServiceImpl: AuthServiceProtocol {
     init(connector: (any ConnectorProtocol)) {
         self.connector = connector
         
-#if os(watchOS)
         connector.namePublisher.sink { [weak self] name in
-            if let name {
-                self?.singIn(name: name)
-            } else {
-                self?.logout()
-            }
+            _ = self?.set(name: name)
         }.store(in: &cancellables)
-#endif
     }
     
     func singIn(name: String) {
-        let authState = AuthState.authorized(name: name)
-        authStatePublished.send(authState)
-        connector.sendData(authState: authState)
+        let authState = set(name: name)
+        sync(authState: authState)
     }
     
     func logout() {
-        let authState = AuthState.unauthorized
+        let authState = set(name: nil)
+        sync(authState: authState)
+    }
+}
+
+private extension AuthServiceImpl {
+    func set(name: String?) -> AuthState {
+        let authState: AuthState
+        if let name {
+            authState = AuthState.authorized(name: name)
+        } else {
+            authState = AuthState.unauthorized
+        }
         authStatePublished.send(authState)
+        return authState
+    }
+    
+    func sync(authState: AuthState) {
         connector.sendData(authState: authState)
     }
 }

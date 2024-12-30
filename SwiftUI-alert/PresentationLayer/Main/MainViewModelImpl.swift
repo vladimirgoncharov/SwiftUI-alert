@@ -11,9 +11,7 @@ final class MainViewModelImpl: MainViewModel {
         self.name = AuthStatePresenter(authState: authService.authState).representation
     }
     
-#if os(iOS)
     func logout() {
         authService.logout()
     }
-#endif
 }

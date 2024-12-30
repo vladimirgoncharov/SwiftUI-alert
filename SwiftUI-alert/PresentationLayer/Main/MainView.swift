@@ -4,9 +4,7 @@ import SwiftUI
 protocol MainViewModel: ObservableObject {
     var name: String { get }
     
-#if os(iOS)
     func logout()
-#endif
 }
 
 struct MainView<ViewModel: MainViewModel>: View {
@@ -21,12 +19,10 @@ struct MainView<ViewModel: MainViewModel>: View {
                 
                 Spacer()
                 
-#if os(iOS)
                 Button("Logout") {
                     vm.logout()
                 }
                 .padding(.bottom, 20)
-#endif
             }
         }
         .padding(.horizontal, 16)
