@@ -5,6 +5,8 @@ final class MainViewModelImpl: MainViewModel {
     @Published var alertManager = AlertManager(style: .native)
 
     let name: String
+    
+    private var logoutTimer: Timer?
 
     private let authService: (any AuthServiceProtocol)
     
@@ -14,8 +16,30 @@ final class MainViewModelImpl: MainViewModel {
     }
     
     func logout() {
+        runLogoutTimer()
         alertManager.enqueue(logoutAlert())
         alertManager.enqueue(confirmLogoutAlert())
+    }
+}
+
+// MARK: - Timer
+
+private extension MainViewModelImpl {
+    func runLogoutTimer() {
+        invalidateLogoutTimer()
+
+        logoutTimer = Timer.scheduledTimer(withTimeInterval: 10.0,
+                                           repeats: false) { [weak self] timer in
+            Task { @MainActor [weak self] in
+                self?.invalidateLogoutTimer()
+                self?.authService.logout()
+            }
+        }
+    }
+    
+    func invalidateLogoutTimer() {
+        logoutTimer?.invalidate()
+        logoutTimer = nil
     }
 }
 
@@ -23,38 +47,40 @@ final class MainViewModelImpl: MainViewModel {
 
 private extension MainViewModelImpl {
     func logoutAlert() -> AlertItem {
-        .simple(item: .init(title: "Log out",
-                            message: "Are you sure?",
+        .simple(item: .init(title: "Cancel logout",
+                            message: "You have 10 seconds to cancel",
                             buttons: [
-                                .init(style: .red,
-                                      text: "Yes",
-                                      action: {
-                                          print("Select Yes")
-                                      }),
                                 .init(style: .default,
-                                      text: "Cancel",
+                                      text: "No, Please!",
                                       action: { [weak self] in
-                                          print("Select Cancel")
+                                          print("Cancelled")
                                           self?.alertManager.clearAll()
+                                          self?.invalidateLogoutTimer()
+                                      }),
+                                .init(style: .red,
+                                      text: "YEEEEEES",
+                                      action: {
+                                          print("Select log out")
                                       })
                             ]))
     }
-    
+
     func confirmLogoutAlert() -> AlertItem {
-        .simple(item: .init(title: "Confirm log out",
-                            message: "You will not be able to undo this action",
+        .simple(item: .init(title: "Confirm to cancel log out",
+                            message: "Tik Tak Tik Tak Tik Tak Tik Tak...",
                             buttons: [
-                                .init(style: .red,
-                                      text: "Yes!",
-                                      action: { [weak self] in
-                                          print("Confirmed Yes")
-                                          self?.authService.logout()
-                                      }),
                                 .init(style: .default,
-                                      text: "Cancel",
+                                      text: "I've changed my mind",
                                       action: { [weak self] in
-                                          print("Select Cancel")
+                                          print("Cancelled")
                                           self?.alertManager.clearAll()
+                                          self?.invalidateLogoutTimer()
+                                      }),
+                                .init(style: .red,
+                                      text: "Yes!!!!!",
+                                      action: { [weak self] in
+                                          self?.authService.logout()
+                                          print("Confirmed log out")
                                       })
                             ]))
     }
