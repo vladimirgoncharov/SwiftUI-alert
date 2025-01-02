@@ -60,6 +60,11 @@
 			path = PresentationLayer;
 			sourceTree = "<group>";
 		};
+		E75189712D22D8FF0091E37A /* UIComponents */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = UIComponents;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -87,6 +92,7 @@
 				E751890D2D22B2B50091E37A /* SwiftUI-alert-watch Watch App */,
 				E751895A2D22C5B10091E37A /* PresentationLayer */,
 				E751893D2D22B61A0091E37A /* BusinessLayer */,
+				E75189712D22D8FF0091E37A /* UIComponents */,
 				E75188F82D22B2710091E37A /* Products */,
 			);
 			sourceTree = "<group>";
@@ -121,6 +127,7 @@
 				E75188F92D22B2710091E37A /* SwiftUI-alert */,
 				E751893D2D22B61A0091E37A /* BusinessLayer */,
 				E751895A2D22C5B10091E37A /* PresentationLayer */,
+				E75189712D22D8FF0091E37A /* UIComponents */,
 			);
 			name = "SwiftUI-alert";
 			packageProductDependencies = (
@@ -145,6 +152,7 @@
 				E751890D2D22B2B50091E37A /* SwiftUI-alert-watch Watch App */,
 				E751893D2D22B61A0091E37A /* BusinessLayer */,
 				E751895A2D22C5B10091E37A /* PresentationLayer */,
+				E75189712D22D8FF0091E37A /* UIComponents */,
 			);
 			name = "SwiftUI-alert-watch Watch App";
 			packageProductDependencies = (
