@@ -2,12 +2,12 @@ import Foundation
 
 @MainActor
 final class MainViewModelImpl: MainViewModel {
-    @Published var alertManager = AlertManager(style: .native)
-
+    @Published var alertViewController = AlertViewController<SimpleAlertViewModel>()
+    
     let name: String
     
     private var logoutTimer: Timer?
-
+    
     private let authService: (any AuthServiceProtocol)
     
     init(authService: (any AuthServiceProtocol)) {
@@ -17,8 +17,8 @@ final class MainViewModelImpl: MainViewModel {
     
     func logout() {
         runLogoutTimer()
-        alertManager.enqueue(logoutAlert())
-        alertManager.enqueue(confirmLogoutAlert())
+        alertViewController.show(logoutAlert())
+        alertViewController.show(confirmLogoutAlert())
     }
 }
 
@@ -27,7 +27,7 @@ final class MainViewModelImpl: MainViewModel {
 private extension MainViewModelImpl {
     func runLogoutTimer() {
         invalidateLogoutTimer()
-
+        
         logoutTimer = Timer.scheduledTimer(withTimeInterval: 10.0,
                                            repeats: false) { [weak self] timer in
             Task { @MainActor [weak self] in
@@ -46,42 +46,54 @@ private extension MainViewModelImpl {
 // MARK: - Alert
 
 private extension MainViewModelImpl {
-    func logoutAlert() -> AlertItem {
-        .simple(item: .init(title: "Cancel logout",
-                            message: "You have 10 seconds to cancel",
-                            buttons: [
-                                .init(style: .default,
-                                      text: "No, Please!",
-                                      action: { [weak self] in
-                                          print("Cancelled")
-                                          self?.alertManager.clearAll()
-                                          self?.invalidateLogoutTimer()
-                                      }),
-                                .init(style: .red,
-                                      text: "YEEEEEES",
-                                      action: {
-                                          print("Select log out")
-                                      })
-                            ]))
+    func logoutAlert() -> SimpleAlertViewModel {
+        SimpleAlertViewModel(
+            title: "Cancel logout",
+            message: "You have 10 seconds to cancel",
+            buttons: [
+                SimpleAlertViewModel.Button(
+                    role: .cancel,
+                    text: "No, Please!",
+                    action: { [weak self] in
+                        print("Cancelled")
+                        self?.alertViewController.closeAll()
+                        self?.invalidateLogoutTimer()
+                    }
+                ),
+                SimpleAlertViewModel.Button(
+                    role: .destructive,
+                    text: "YEEEEEES",
+                    action: {
+                        print("Select log out")
+                    }
+                )
+            ]
+        )
     }
-
-    func confirmLogoutAlert() -> AlertItem {
-        .simple(item: .init(title: "Confirm to cancel log out",
-                            message: "Tik Tak Tik Tak Tik Tak Tik Tak...",
-                            buttons: [
-                                .init(style: .default,
-                                      text: "I've changed my mind",
-                                      action: { [weak self] in
-                                          print("Cancelled")
-                                          self?.alertManager.clearAll()
-                                          self?.invalidateLogoutTimer()
-                                      }),
-                                .init(style: .red,
-                                      text: "Yes!!!!!",
-                                      action: { [weak self] in
-                                          self?.authService.logout()
-                                          print("Confirmed log out")
-                                      })
-                            ]))
+    
+    func confirmLogoutAlert() -> SimpleAlertViewModel {
+        SimpleAlertViewModel(
+            title: "Confirm to cancel log out",
+            message: "Tik Tak Tik Tak Tik Tak Tik Tak...",
+            buttons: [
+                SimpleAlertViewModel.Button(
+                    role: .cancel,
+                    text: "I've changed my mind",
+                    action: { [weak self] in
+                        print("Cancelled")
+                        self?.alertViewController.closeAll()
+                        self?.invalidateLogoutTimer()
+                    }
+                ),
+                SimpleAlertViewModel.Button(
+                    role: .destructive,
+                    text: "Yes!!!!!",
+                    action: { [weak self] in
+                        self?.authService.logout()
+                        print("Confirmed log out")
+                    }
+                )
+            ]
+        )
     }
 }
