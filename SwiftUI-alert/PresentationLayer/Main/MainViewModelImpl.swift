@@ -2,7 +2,8 @@ import Foundation
 
 @MainActor @Observable
 final class MainViewModelImpl: MainViewModel {
-    let alertViewController = AlertViewController<SimpleAlertViewModel>()
+    let simpleAlertViewController = AlertViewController<SimpleAlertViewModel>()
+    let sheetAlertViewController = AlertViewController<SheetAlertViewModel>()
     
     let name: String
     
@@ -16,10 +17,14 @@ final class MainViewModelImpl: MainViewModel {
         self.name = AuthStatePresenter(authState: authService.authState).representation
     }
     
+    func onAppear() {
+        sheetAlertViewController.show(sheetAlert())
+    }
+    
     func logout() {
         runLogoutTimer()
-        alertViewController.show(logoutAlert())
-        alertViewController.show(confirmLogoutAlert())
+        simpleAlertViewController.show(logoutAlert())
+        simpleAlertViewController.show(confirmLogoutAlert())
     }
 }
 
@@ -44,7 +49,7 @@ private extension MainViewModelImpl {
     }
 }
 
-// MARK: - Alert
+// MARK: - Simple Alert
 
 private extension MainViewModelImpl {
     func logoutAlert() -> SimpleAlertViewModel {
@@ -57,7 +62,7 @@ private extension MainViewModelImpl {
                     text: "No, Please!",
                     action: { [weak self] in
                         print("Cancelled")
-                        self?.alertViewController.closeAll()
+                        self?.simpleAlertViewController.closeAll()
                         self?.invalidateLogoutTimer()
                     }
                 ),
@@ -82,7 +87,7 @@ private extension MainViewModelImpl {
                     text: "I've changed my mind",
                     action: { [weak self] in
                         print("Cancelled")
-                        self?.alertViewController.closeAll()
+                        self?.simpleAlertViewController.closeAll()
                         self?.invalidateLogoutTimer()
                     }
                 ),
@@ -92,6 +97,24 @@ private extension MainViewModelImpl {
                     action: { [weak self] in
                         self?.authService.logout()
                         print("Confirmed log out")
+                    }
+                )
+            ]
+        )
+    }
+}
+
+// MARK: - Sheet Alert
+
+private extension MainViewModelImpl {
+    func sheetAlert() -> SheetAlertViewModel {
+        SheetAlertViewModel(
+            title: "Greeting, \(name)",
+            buttons: [
+                SheetAlertViewModel.Button(
+                    text: "Thanks",
+                    action: {
+                        print("Press thanks")
                     }
                 )
             ]

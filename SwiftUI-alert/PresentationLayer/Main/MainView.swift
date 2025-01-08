@@ -2,9 +2,12 @@ import SwiftUI
 
 @MainActor
 protocol MainViewModel {
-    var alertViewController: AlertViewController<SimpleAlertViewModel> { get }
+    var simpleAlertViewController: AlertViewController<SimpleAlertViewModel> { get }
+    var sheetAlertViewController: AlertViewController<SheetAlertViewModel> { get }
+
     var name: String { get }
     
+    func onAppear()
     func logout()
 }
 
@@ -29,6 +32,10 @@ struct MainView<ViewModel: MainViewModel>: View {
             }
         }
         .padding(.horizontal, 16)
-        .alertView(alertViewController: vm.alertViewController)
+        .alertView(alertViewController: vm.simpleAlertViewController)
+        .alertView(alertViewController: vm.sheetAlertViewController)
+        .onAppear {
+            vm.onAppear()
+        }
     }
 }
