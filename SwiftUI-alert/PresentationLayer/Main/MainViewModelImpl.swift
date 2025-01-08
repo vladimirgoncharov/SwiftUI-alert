@@ -1,11 +1,12 @@
 import Foundation
 
-@MainActor
+@MainActor @Observable
 final class MainViewModelImpl: MainViewModel {
-    @Published var alertViewController = AlertViewController<SimpleAlertViewModel>()
+    let alertViewController = AlertViewController<SimpleAlertViewModel>()
     
     let name: String
     
+    @ObservationIgnored
     private var logoutTimer: Timer?
     
     private let authService: (any AuthServiceProtocol)

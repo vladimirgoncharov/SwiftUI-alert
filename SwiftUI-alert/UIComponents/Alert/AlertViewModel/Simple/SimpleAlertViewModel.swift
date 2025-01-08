@@ -29,7 +29,11 @@ struct SimpleAlertViewModel: AlertViewModel {
         self.buttons = buttons
     }
     
-    static func makeViewModifier(alertManager: AlertViewController<Self>) -> AlertViewModifier {
-        AlertViewModifier(alertManager: alertManager)
+    static func makeViewModifier(
+        alertViewController: AlertViewController<Self>,
+        isPresented: Binding<Bool>
+    ) -> AlertViewModifier {
+        AlertViewModifier(alertViewController: alertViewController,
+                          isPresented: isPresented)
     }
 }

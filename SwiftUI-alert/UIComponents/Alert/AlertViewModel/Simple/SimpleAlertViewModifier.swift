@@ -1,24 +1,22 @@
-import Foundation
 import SwiftUI
 
-// TODO: - Добавить в отдельный файл SystemNotification.
-
 struct SimpleAlertViewModifier: ViewModifier {
-    @ObservedObject var alertManager: AlertViewController<SimpleAlertViewModel>
+    let alertViewController: AlertViewController<SimpleAlertViewModel>
+    @Binding var isPresented: Bool
     
     func body(content: Content) -> some View {
-        if let currentItem = alertManager.current {
+        if let currentItem = alertViewController.current {
             content
                 .alert(
                     currentItem.title,
-                    isPresented: $alertManager.isPresented,
-                    actions: {
+                    isPresented: $isPresented,
+                    actions: { [currentItem] in
                         ForEach(currentItem.buttons,
                                 id: \.id) { button in
                             Button(button.text,
-                                   role: button.role) { [weak alertManager] in
+                                   role: button.role) { [weak alertViewController] in
                                 button.action()
-                                alertManager?.close(id: currentItem.id)
+                                alertViewController?.close(id: currentItem.id)
                             }
                         }
                     },
