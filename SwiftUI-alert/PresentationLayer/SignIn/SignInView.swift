@@ -13,6 +13,8 @@ struct SignInView<ViewModel: SignInViewModel>: View {
     var body: some View {
         ZStack {
             VStack(spacing: 0) {
+                Text("Sing In")
+
                 Spacer()
                 
                 TextField("Input your name",

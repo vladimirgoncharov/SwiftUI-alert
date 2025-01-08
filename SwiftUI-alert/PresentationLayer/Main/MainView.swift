@@ -1,18 +1,24 @@
 import SwiftUI
 
 @MainActor
-protocol MainViewModel: ObservableObject {
+protocol MainViewModel {
+    var simpleAlertViewController: AlertViewController<SimpleAlertViewModel> { get }
+    var sheetAlertViewController: AlertViewController<SheetAlertViewModel> { get }
+
     var name: String { get }
     
+    func onAppear()
     func logout()
 }
 
 struct MainView<ViewModel: MainViewModel>: View {
-    @StateObject var vm: ViewModel
+    let vm: ViewModel
     
     var body: some View {
         ZStack {
             VStack(alignment: .center, spacing: 0) {
+                Text("Main")
+                
                 Spacer()
                 
                 Text("Hello, \(vm.name)")
@@ -26,5 +32,10 @@ struct MainView<ViewModel: MainViewModel>: View {
             }
         }
         .padding(.horizontal, 16)
+        .alertView(alertViewController: vm.simpleAlertViewController)
+        .alertView(alertViewController: vm.sheetAlertViewController)
+        .onAppear {
+            vm.onAppear()
+        }
     }
 }
